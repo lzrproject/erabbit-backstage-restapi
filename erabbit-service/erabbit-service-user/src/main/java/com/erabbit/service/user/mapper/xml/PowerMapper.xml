@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erabbit.service.user.mapper.PowerMapper">
+
+    <select id="findAll" resultType="Power">
+        select id,power_name as powerName,power_type as powerType,power_code as powerCode,power_url as powerUrl,
+        open_type as openType,parent_id as parentId,icon,sort,enable from tb_power
+        <if test="parentId!=null and parentId!=''">
+            where parent_id = #{parentId}
+        </if>
+        order by sort asc
+    </select>
+
+    <select id="findMenuAll" resultType="Menu">
+        SELECT id,parent_id as parentId,power_name as title,power_type as type,open_type as openType,icon,power_url as href,sort,`enable`
+        FROM `tb_power` p
+        right join (select distinct rp.power_id from tb_user_role ur inner join tb_role_power rp on ur.role_id = rp.role_id where ur.user_id = #{uid}) a
+        on p.id = a.power_id
+        order by sort
+    </select>
+</mapper>

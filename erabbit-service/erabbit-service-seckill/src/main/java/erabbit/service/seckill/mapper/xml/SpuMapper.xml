@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="erabbit.service.seckill.mapper.SpuMapper">
+
+
+    <resultMap id="getOne" type="com.erabbit.seckill.pojo.Spu">
+        <result column="spuId" property="id" />
+        <result column="spuName" property="name" />
+        <result column="image" property="image" />
+        <result column="images" property="images" />
+        <result column="introduction" property="introduction" />
+        <result column="spec_items" property="specItems" />
+        <collection property="categories" ofType="com.erabbit.seckill.pojo.Category">
+            <result column="cateId" property="id" />
+            <result column="cateName" property="name" />
+            <result column="cimage" property="image" />
+        </collection>
+    </resultMap>
+    <select id="getOne" resultMap="getOne">
+        select sp.id spuId,sp.name spuName,sp.image,sp.images,sp.introduction,sp.spec_items,ca.id cateId,ca.name cateName,ca.image cimage
+        from tb_spu sp left join tb_category ca on (sp.category1_id = ca.id or sp.category2_id = ca.id)
+        where sp.id = #{id} order by ca.parent_id
+    </select>
+</mapper>

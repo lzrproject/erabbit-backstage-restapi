@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('403')"/>
+    <link th:href="@{/admin/css/other/error.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="content">
+    <img src="../../admin/images/403.svg" alt="">
+    <div class="content-r">
+        <h1>403</h1>
+        <p>抱歉，你无权访问该页面</p>
+        <button data-type="tabChange" class="pear-btn pear-btn-primary">关闭</button>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+</body>
+<script>
+    layui.use(['admin','layer','jquery','element','admin','table'], function () {
+        var $ = layui.jquery;
+        var admin = layui.admin;
+        var element = layui.element;
+        $("button").click(function () {
+            // var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            // console.log(index);
+            // parent.layer.close(index); //再执行关闭
+            // top.layui.frame.changePageByElement("content","/console","首页",true)
+            // element.tabChange('content', '10');
+
+            top.layui.tab.delCurrentTabByElem("content",function () {
+                // top.layui.frame.changePageByElement("content","/console","首页",true);
+                // admin.jump(10,"首页","/console",true);
+                element.tabChange('content', '10');
+            });
+            // top.tab.delCurrentTabByElem("content",callback());
+
+        });
+
+    })
+
+</script>
+</html>

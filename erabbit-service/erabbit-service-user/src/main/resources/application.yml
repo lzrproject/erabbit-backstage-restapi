@@ -1,0 +1,56 @@
+server:
+  port: 10051
+spring:
+  profiles:
+    active: prod
+  application:
+    name: service-user
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/erabbit_data?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 123456
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+
+#feign:
+#  httpclient:
+#    enabled: true
+#    max-connections: 200
+#    max-connections-per-route: 50   # 连接池数量
+#    connection-timeout: 10000
+##    connection-timer-repeat:
+#  hystrix:
+#    enabled: true
+#
+#hystrix:
+#  command:
+#    default:
+#      execution:
+#        timeout:
+#          enable: true
+##        isolation:
+##          strategy: SEMAPHORE
+#          thread:
+#            timeoutInMilleseconds: 60000
+
+#ribbon:
+#  #指的是建立连接所用的时间，适用于网络状况正常的情况下，两端连接所用的实际时间，单位毫秒
+#  ReadTimeout: 5000
+#  #指的是建立连接后从服务器读取到可用资源所用的时间，单位毫秒
+#  ConnectTimeout: 10000
+
+
+# Mybatis 配 置
+mybatis-plus:
+  # 配 置 扫 描
+  mapper-locations: classpath:**/xml/**.xml
+  # 别 名 扫 描
+  type-aliases-package: com.erabbit.user.pojo;
+#  # 日 志
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

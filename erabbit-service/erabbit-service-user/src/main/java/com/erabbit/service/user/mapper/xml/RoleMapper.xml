@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erabbit.service.user.mapper.RoleMapper">
+    <select id="findPage" resultType="Role">
+        select * from tb_role
+        <where>
+            <if test="roleName != null and roleName != ''">
+                role_name like "%"#{roleName}"%"
+            </if>
+            <if test="roleCode != null and roleCode != ''">
+                and role_code like "%"#{roleCode}"%"
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getRolePower" resultType="Power">
+        select po.*,if(rp.role_id is not null ,"1","0") as checkArr from tb_power po left join
+        (select * from tb_role_power where role_id = #{rid}) rp on po.id = rp.power_id
+    </select>
+
+    <insert id="batchAddRoleAndPower" keyColumn="">
+        insert into tb_role_power(role_id,power_id) values
+        <foreach collection="powerIds" item="powerId" separator=",">
+            (#{rid},#{powerId})
+        </foreach>
+    </insert>
+</mapper>

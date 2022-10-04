@@ -1,0 +1,46 @@
+server:
+  port: 18071
+spring:
+  profiles:
+    active: prod
+  application:
+    name: goods
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/erabbit_data?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 123456
+#  rabbitmq:
+#    host: localhost #mq的服务器地址
+#    username: guest #账号
+#    password: guest #密码
+  redis:
+    port: 6379
+    host: localhost
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+feign:
+  hystrix:
+    enabled: true
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          #如果enabled设置为false，则请求超时交给ribbon控制
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+          strategy: SEMAPHORE
+
+# Mybatis 配 置
+mybatis-plus:
+  # 配 置 扫 描
+  mapper-locations: classpath:**/xml/**.xml

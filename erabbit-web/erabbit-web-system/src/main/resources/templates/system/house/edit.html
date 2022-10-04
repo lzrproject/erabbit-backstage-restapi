@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('房源修改')"/>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+                <div class="layui-form-item layui-hide">
+                    <label class="layui-form-label">编号</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="${sysPower.id}" name="id" lay-verify="title"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">父级</label>
+                    <div class="layui-input-block">
+                        <ul id="selectParent" name="parentId" class="dtree" data-id="-1"></ul>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="${sysPower.hotelName}" id="hotelName" name="hotelName" lay-verify="title"
+                               autocomplete="off" placeholder="房源名称" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="addressItem">
+                    <label class="layui-form-label">地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="address" name="address" th:value="${sysPower.address}" autocomplete="off" placeholder="地址" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="imageUrlItem">
+                    <label class="layui-form-label">图片路径</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="imageUrl" name="imageUrl" th:value="${sysPower.imageUrl}" lay-verify="image" autocomplete="off" placeholder="图片路径" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="priceItem">
+                    <label class="layui-form-label">价格</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="price" name="price" th:value="${sysPower.price}" lay-verify="price" autocomplete="off" placeholder="价格" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="sortItem">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="sort" name="sort" th:value="${sysPower.sort}" lay-verify="title" autocomplete="off" placeholder="排序" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text" id="servicesItem">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入描述" id="services" name="services" th:text="${sysPower.services}" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="power-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    layui.use(['form', 'jquery', 'iconPicker', 'dtree'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let iconPicker = layui.iconPicker;
+        let dtree = layui.dtree;
+
+        dtree.renderSelect({
+            elem: "#selectParent",
+            url: "/house/selectParent",
+            method: 'get',
+            selectInputName: {nodeId: "parentId", context: "hotelName"},
+            skin: "layui",
+            dataFormat: "list",
+            response: {treeId: "id", parentId: "parentId", title: "hotelName"},
+            selectInitVal: '[[${sysPower.parentId}]]'
+        });
+
+        $('#address',function(){
+            if(this.val() == ""){
+                $("#addressItem").hide();
+                $("#address").val("");
+            }else {
+                $("#addressItem").show();
+            }
+        });
+
+        dtree.on("node('selectParent')" ,function(obj){
+            console.log(obj.param); // 点击当前节点传递的参数
+
+            if (obj.param.level == '1') {
+                $("#hotelNameItem").show();
+                $("#imageUrlItem").show();
+                $("#sortItem").show();
+                $("#servicesItem").show();
+                $("#addressItem").show();
+                $("#priceItem").show();
+                $("#btn").removeAttr("disabled");
+            } else if (obj.param.level == '2') {
+                $("#hotelNameItem").show();
+                $("#imageUrlItem").show();
+                $("#sortItem").show();
+                $("#servicesItem").show();
+                $("#priceItem").show();
+                $("#addressItem").hide();
+                $("#address").val("");
+                $("#btn").removeAttr("disabled");
+            } else if (obj.param.level == '3') {
+                $("#hotelNameItem").hide();
+                $("#imageUrlItem").hide();
+                $("#sortItem").hide();
+                $("#servicesItem").hide();
+                $("#addressItem").hide();
+                $("#priceItem").hide();
+                $("#hotelName").val("");
+                $("#imageUrl").val("");
+                $("#sort").val("");
+                $("#services").val("");
+                $("#address").val("");
+                $("#price").val("");
+                $("#btn").attr("disabled",true);
+            }
+        });
+
+        form.verify({
+            image: function(value){
+                if(value == ''){
+                    return '不能为空';
+                }
+            }
+        });
+
+        form.on('submit(power-save)', function (data) {
+            // console.log(data.field);
+            $.ajax({
+                url: '/house/update',
+                data: JSON.stringify(data.field),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'put',
+                success: function (result) {
+                    if (result.flag) {
+                        layer.msg(result.message, {icon: 1, time: 1000}, function () {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.render();
+                        });
+                    } else {
+                        layer.msg(result.message, {icon: 2, time: 1000});
+                    }
+                }
+            })
+            return false;
+        });
+
+
+        window.init = function (type) {
+            console.log(type)
+            if (type == '0') {
+                $("#powerUrlItem").hide();
+                $("#powerCodeItem").hide();
+                $("#openTypeItem").hide();
+                $("#powerUrl").val("");
+                $("#powerCode").val("");
+                $("#openType").val("");
+            } else if (type == '1') {
+                $("#powerUrlItem").show();
+                $("#powerCodeItem").show();
+                $("#openTypeItem").show();
+            } else if (type == '2') {
+                $("#powerUrlItem").hide();
+                $("#openTypeItem").hide();
+                $("#powerCodeItem").show();
+                $("#powerUrl").val("");
+                $("#openType").val("");
+            }
+        }
+    })
+</script>
+<script>
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+[
+  {
+    "attrsText":"规格:1瓶",
+    "count":8,
+    "id":"3995885",
+    "isCollect":false,
+    "isEffective":true,
+    "name":"飞天53%vol500ml贵州茅台酒（带杯）",
+    "payPrice":"1499",
+    "picture":"https://yanxuan-item.nosdn.127.net/d46e005025a5d3b73c4781d31b327558.jpg",
+    "price":"1499",
+    "selected":true,
+    "skuId":"300247710",
+    "stock":100
+  },
+  {
+    "attrsText":"颜色:火焰红",
+    "count":32,
+    "id":"3394027",
+    "isCollect":false,
+    "isEffective":true,
+    "name":"平台有道翻译王2.0pro",
+    "payPrice":"1388",
+    "picture":"https://yanxuan-item.nosdn.127.net/f4d16ea8149ae59cce203a73a61d3d50.png",
+    "price":"1388",
+    "selected":true,
+    "skuId":"3567056",
+    "stock":1000
+  }
+]

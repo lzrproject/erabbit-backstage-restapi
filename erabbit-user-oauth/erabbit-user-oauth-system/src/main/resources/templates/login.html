@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('登录')"/>
+	<link rel="stylesheet" th:href="@{/admin/css/other/login.css}" />
+</head>
+<!-- 代 码 结 构 -->
+<body background="/admin/images/login.svg">
+<form class="layui-form" action="javascript:void(0);">
+	<div class="layui-form-item">
+		<img class="logo" src="/admin/images/logo.png" />
+		<div class="title">后台系统管理</div>
+		<div class="desc">
+			珠 科 最 具 影 响 力 的 设 计 规 范 之 一
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<input name="username" id="username" type="text" placeholder="账 户" value="admin" lay-verify="username" hover class="layui-input"  />
+	</div>
+	<div class="layui-form-item">
+		<input name="password" id="password" type="password" placeholder="密 码" value="admin" lay-verify="password" hover class="layui-input"  />
+	</div>
+	<div class="layui-form-item">
+		<input placeholder="验证码 : " name="captcha" hover class="code layui-input layui-input-inline"  />
+		<img src="/system/captcha/generate" class="codeImage" id="captchaImage"/>
+	</div>
+	<div class="layui-form-item">
+		<input type="checkbox" name="remember-me" title="记住密码" lay-skin="primary">
+	</div>
+	<div class="layui-form-item">
+		<button class="pear-btn pear-btn-success login" lay-submit lay-filter="login">
+			登 入
+		</button>
+	</div>
+</form>
+<th:block th:include="include :: footer"/>
+<script>
+	layui.use(['form','jquery','layer','button','popup'], function() {
+		let form = layui.form;
+		let $ = layui.jquery;
+		let layer = layui.layer;
+		let button = layui.button;
+		let popup = layui.popup;
+		let captchaPath = "/system/captcha/generate";
+
+		form.verify({
+			username: function(value){
+				if(value.length == 0){
+					return '请输入账户';
+				}
+			}
+			,password: function(value){
+				if(value.length == 0){
+					return '请输入密码';
+				}
+			}
+		});
+
+		//设置cookie
+		function setCookie(username,password) {
+			let loginCode = username //获取用户名信息
+			let pwd = password; //获取登录密码信息
+			console.log(loginCode);
+				//设置cookie过期时间
+				// var date = new Date();
+				// date.setTime(date.getTime() + 60 * 1000); //只能这么写，60表示60秒钟
+				//console.log("cookie过期时间："+date);
+				$.cookie("login_code", loginCode, {
+					expires: 7,
+					path: '/'
+				}); //调用jquery.cookie.js中的方法设置cookie中的用户名
+				$.cookie("pwd", pwd, {
+					expires: 7,
+					path: '/'
+				}); //调用jquery.cookie.js中的方法设置cookie中的登陆密码，并使用base64（jquery.base64.js）进行加密
+		}
+
+		//清除所有cookie函数
+		function clearAllCookie() {
+			let date = new Date();
+			date.setTime(date.getTime() - 10000);
+			let keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+			console.log("需要删除的cookie名字：" + keys);
+
+			if (keys) {
+				for (let i = keys.length; i--;){
+					if(keys[i] == "pwd" || keys[i] == "login_code")
+						document.cookie = keys[i] + "=0; expire=" + date.toUTCString() + "; path=/";
+				}
+
+			}
+		}
+		//获取cookie
+		// function getCookie() {
+		// 	let loginCode = $.cookie("login_code"); //获取cookie中的用户名
+		// 	let pwd = $.cookie("pwd"); //获取cookie中的登陆密码
+		// 	// console.log("获取cookie:账户：" + login
+		// 	if (!loginCode || loginCode == 0) {
+		// 		// console.log("账户：" + !loginCode);
+		// 		// alert("请输出内容！");
+		// 	} else {
+		// 		$("#username").val(loginCode);
+		// 	}
+		// 	if (!pwd || pwd == 0) {
+		// 		// console.log("密码：" + !pwd);
+		// 	} else {
+		// 		//密码存在的话把密码填充到密码文本框
+		// 		//console.log("密码解密后："+$.base64.decode(pwd));
+		// 		$("#password").val(pwd);
+		// 		//密码存在的话把“记住用户名和密码”复选框勾选住
+		// 		$("input[type='checkbox']").attr("checked", "true");
+		// 	}
+		// 	form.render();
+		//
+		// }
+		// getCookie();
+
+
+		form.on('submit(login)', function(data){
+			console.log(data.field);
+			let loader = layer.load();
+			let btn = button.load({elem: '.login'});
+
+
+			//判断是否选中复选框，如果选中，添加cookie
+			// let rememberPwd = $("input[type='checkbox']").is(':checked');
+			// console.log("是否记住密码：" + rememberPwd);
+			// data.field.rememberPwd="true";
+
+			$.ajax({
+				url:'/login/admin',
+				data:data.field,
+				type:"post",
+				dataType:'json',
+				success:function(result){
+					console.log(result);
+					layer.close(loader);
+					btn.stop(function(){
+						if(result.flag){
+						    // console.log(result.data);
+							// if (rememberPwd) {
+							// 	//添加cookie
+							// 	setCookie(data.field.username,data.field.password);
+							// } else {
+							// 	clearAllCookie();
+							// }
+							popup.success(result.message,function(){
+                                $.cookie("Authorization", result.data.accessToken, {
+                                    // expires: 7,
+									path: '/'
+                                });
+								// console.log(window.location.hostname +":10012/index")
+								location.href = "http://"+window.location.hostname +":10012/index";
+								// alert("登录成功")
+
+							})
+						}else{
+							popup.failure(result.message,function(){
+								document.getElementById("captchaImage").src=captchaPath + "?" + Math.random();
+							});
+						}
+					})
+				}
+			});
+			return false;
+		});
+
+		$("#captchaImage").click(function(){
+			document.getElementById("captchaImage").src= captchaPath + "?" + Math.random();
+		})
+		setInterval(function(){
+			document.getElementById("captchaImage").src= captchaPath + "?" + Math.random();
+		},30 * 1000);
+		validateKickout();
+	})
+</script>
+<script>
+	if(window!=top){ top.location.href = location.href; }
+
+	function validateKickout() {
+		if (getParam("abnormalout") == 1) {
+			layer.alert("<font color='red'>您已在别处登录，请您修改密码或重新登录</font>", {
+						icon: 0,
+						title: "系统提示"
+					},
+					function(index) {
+						layer.close(index);
+					});
+		}else if(getParam("sessionout") == 1){
+			layer.alert("<font color='red'>登录已过期，请重新登录</font>", {
+						icon: 0,
+						title: "系统提示"
+					},
+					function(index) {
+						layer.close(index);
+					});
+		}
+	}
+
+	function getParam(paramName) {
+		var reg = new RegExp("(^|&)" + paramName + "=([^&]*)(&|$)");
+		var r = window.location.search.substr(1).match(reg);
+		if (r != null) return decodeURI(r[2]);
+		return null;
+	}
+</script>
+</body>
+</html>

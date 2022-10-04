@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('房源新增')"/>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">父级</label>
+                    <div class="layui-input-block">
+                        <ul id="selectParent" name="parentId" class="dtree" data-id="-1"></ul>
+                    </div>
+                </div>
+                <div class="layui-form-item" id="hotelNameItem">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="hotelName" name="hotelName" lay-verify="title" autocomplete="off" placeholder="房源名称"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" id="addressItem">
+                    <label class="layui-form-label">地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="address" name="address" autocomplete="off" placeholder="地址" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" id="imageUrlItem">
+                    <label class="layui-form-label">图片路径</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="imageUrl" name="imageUrl" lay-verify="image" autocomplete="off" placeholder="图片路径" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="priceItem">
+                    <label class="layui-form-label">价格</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="price" name="price" lay-verify="price" autocomplete="off" placeholder="价格" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item" id="sortItem">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="sort" name="sort" lay-verify="title" autocomplete="off" placeholder="排序" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text" id="servicesItem">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入描述" id="services" name="services" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" id="btn" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="power-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['form', 'jquery', 'iconPicker', 'dtree','dictionary'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let iconPicker = layui.iconPicker;
+        let dtree = layui.dtree;
+
+        dtree.renderSelect({
+            elem: "#selectParent",
+            url: "/house/selectParent",
+            method: 'get',
+            selectInputName: {nodeId: "parentId", context: "hotelName"},
+            skin: "layui",
+            dataFormat: "list",
+            response: {treeId: "id", parentId: "parentId", title: "hotelName"},  //修改response中返回数据的定义
+            selectInitVal: "0"
+        });
+
+
+        dtree.on("node('selectParent')" ,function(obj){
+            console.log(obj.param); // 点击当前节点传递的参数
+
+            if (obj.param.level == '1') {
+                $("#hotelNameItem").show();
+                $("#imageUrlItem").show();
+                $("#sortItem").show();
+                $("#servicesItem").show();
+                $("#addressItem").show();
+                $("#priceItem").show();
+                $("#btn").removeAttr("disabled");
+            } else if (obj.param.level == '2') {
+                $("#hotelNameItem").show();
+                $("#imageUrlItem").show();
+                $("#sortItem").show();
+                $("#servicesItem").show();
+                $("#priceItem").show();
+                $("#addressItem").hide();
+                $("#address").val("");
+                $("#btn").removeAttr("disabled");
+            } else if (obj.param.level == '3') {
+                $("#hotelNameItem").hide();
+                $("#imageUrlItem").hide();
+                $("#sortItem").hide();
+                $("#servicesItem").hide();
+                $("#addressItem").hide();
+                $("#priceItem").hide();
+                $("#hotelName").val("");
+                $("#imageUrl").val("");
+                $("#sort").val("");
+                $("#services").val("");
+                $("#address").val("");
+                $("#price").val("");
+                $("#btn").attr("disabled",true);
+            }
+        });
+
+        form.verify({
+            image: function(value){
+                if(value == ''){
+                    return '不能为空';
+                }
+            }
+        });
+
+        form.on('submit(power-save)', function (data) {
+            $.ajax({
+                url: '/house/save',
+                data: JSON.stringify(data.field),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'post',
+                success: function (result) {
+                    if (result.flag) {
+                        layer.msg(result.message, {icon: 1, time: 1000}, function () {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                            parent.render();
+                        });
+                    } else {
+                        layer.msg(result.message, {icon: 2, time: 1000});
+                    }
+                }
+            })
+            return false;
+        });
+
+        iconPicker.render({
+            // 选择器，推荐使用input
+            elem: '#icon',
+            // 数据类型：fontClass/unicode，推荐使用fontClass
+            type: 'fontClass',
+            // 是否开启搜索：true/false
+            search: true,
+            // 是否开启分页
+            page: true,
+            // 每页显示数量，默认12
+            limit: 12,
+            // 点击回调
+            click: function (data) {
+                console.log(data);
+            }
+        });
+    })
+</script>
+<script>
+</script>
+</body>
+</html>

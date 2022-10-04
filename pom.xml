@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>erabbit-backstage-restapi</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>erabbit-common</module>
+        <module>erabbit-gateway</module>
+        <module>erabbit-service</module>
+        <module>erabbit-service-api</module>
+        <module>erabbit-user-oauth</module>
+        <module>erabbit-web</module>
+        <module>erabbit-code-generator</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+        <spring.cloud.version>Hoxton.SR9</spring.cloud.version>
+        <spring.cloud.alibaba.version>2.2.6.RELEASE</spring.cloud.alibaba.version>
+        <lombok.version>1.18.22</lombok.version>
+        <mysql.version>8.0.27</mysql.version>
+        <dubbo.version>2.6.11</dubbo.version>
+        <security.version>5.6.0</security.version>
+        <keycloak.version>15.0.2</keycloak.version>
+        <rabbitmq.version>5.14.0</rabbitmq.version>
+        <kafka.version>3.0.0</kafka.version>
+        <seata.version>1.3.0</seata.version>
+        <redis.version>2.6.0</redis.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring.cloud.alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

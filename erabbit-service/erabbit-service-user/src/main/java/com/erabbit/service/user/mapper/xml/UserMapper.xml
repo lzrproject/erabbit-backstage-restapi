@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erabbit.service.user.mapper.UserMapper">
+
+    <select id="findUsernameDetails" resultType="User">
+        select u.*,a.roleName,a.roleIds from tb_user u inner join
+        (select username,group_concat(role.role_name) roleName,group_concat(ur.role_id) roleIds from tb_user `user` left join tb_user_role ur on user.id = ur.user_id
+        left join tb_role role on ur.role_id = role.id
+        where `user`.username = #{username}
+        group by `user`.username ) a on u.username = a.username
+    </select>
+
+    <select id="findPowerCodeString" resultType="String">
+        select group_concat(power_code) from
+        (select distinct p.power_code from tb_role_power rp inner join tb_power p on rp.power_id = p.id
+        where
+        <foreach collection="array" item="rid" open="(" separator="or" close=")">
+        rp.role_id = #{rid}
+        </foreach>
+        and p.power_code is not null) a
+    </select>
+
+    <select id="findPage" resultType="User">
+        select * from tb_user
+        <if test="username != null and username != ''">
+            where username like "%"#{username}"%"
+        </if>
+
+    </select>
+
+    <insert id="batchAddRoleAndUser">
+        insert into tb_user_role(user_id,role_id) values
+        <foreach  collection="rids" item="rid" separator=",">
+            (#{uid},#{rid})
+        </foreach>
+
+    </insert>
+
+    <select id="findRoleByUid" resultType="Role">
+        select ro.*, if(ur.user_id is not null ,"1","0") as checked
+        from tb_role ro left join
+                 (select * from tb_user_role where user_id = #{uid}) ur on ro.id = ur.role_id
+    </select>
+
+</mapper>

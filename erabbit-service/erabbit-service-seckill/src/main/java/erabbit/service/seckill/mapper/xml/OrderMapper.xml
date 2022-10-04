@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="erabbit.service.seckill.mapper.OrderMapper">
+
+
+    <insert id="insertOrderItem" parameterType="list">
+        insert into tb_order_item(id,spu_id,sku_id,order_id,`name`,price,num,money,pay_money,image,attrsText)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.spuId},#{item.skuId},#{item.orderId},#{item.name},#{item.price},#{item.num},#{item.money},#{item.payMoney},#{item.image},#{item.attrsText})
+        </foreach>
+
+    </insert>
+
+    <select id="getOrderItem" resultType="com.erabbit.seckill.pojo.TSku">
+        select sku_id,price as curPrice,price as realPay,`name`,spu_id,image,attrsText,num as quantity
+        from tb_order_item
+        where order_id = #{orderId};
+    </select>
+
+    <resultMap id="getOne" type="com.erabbit.seckill.pojo.NewOrder">
+        <result column="oid" property="id" />
+        <result column="total_num" property="totalNum" />
+        <result column="total_money" property="totalMoney" />
+        <result column="post_fee" property="postFee" />
+        <result column="payMoney" property="payMoney" />
+        <result column="create_time" property="createTime" />
+        <result column="pay_latest_time" property="payLatestTime" />
+        <result column="order_state" property="orderState" />
+        <result column="address_id" property="addressId" />
+        <collection property="skus" ofType="com.erabbit.seckill.pojo.TSku">
+            <result column="id" property="id" />
+            <result column="name" property="name" />
+            <result column="price" property="price" />
+            <result column="price" property="curPrice" />
+            <result column="num" property="quantity" />
+            <result column="money" property="oldPrice" />
+            <result column="pay_money" property="realPay" />
+            <result column="image" property="image" />
+            <result column="attrsText" property="attrsText" />
+        </collection>
+    </resultMap>
+    <select id="getOrder" resultMap="getOne">
+        select o.id as oid,o.total_num,o.total_money,o.post_fee,o.pay_money as payMoney,o.create_time,o.pay_latest_time,o.order_state,o.address_id,
+               oi.id,oi.name,oi.price,oi.num,oi.money,oi.pay_money,oi.image,oi.attrsText
+        from tb_order o
+                 inner join tb_order_item oi on o.id = oi.order_id
+        where o.id = #{orderId}
+    </select>
+</mapper>

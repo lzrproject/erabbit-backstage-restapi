@@ -1,0 +1,37 @@
+server:
+  port: 10013
+spring:
+  profiles:
+    active: prod
+  datasource:
+    #MySQL配置
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/erabbit_data?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 123456
+  application:
+    name: service-sys-oauth
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  main:
+    allow-bean-definition-overriding: true
+
+
+auth:
+  clientId: erabbit
+  clientSecret: erabbit
+  location-file: erabbit.jks
+#  cookieDomain: 192.168.0.97
+#  cookieMaxAge: 7200
+
+#证书和密钥配置
+encrypt:
+  key-store:
+    #证书路径
+    location: classpath:/erabbit.jks
+    #密钥-别名-证书密码
+    secret: erabbit
+    alias: erabbit
+    password: erabbit

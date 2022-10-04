@@ -1,0 +1,72 @@
+server:
+  port: 10015
+spring:
+  application:
+    name: service-web-gateway
+  cloud:
+    #限流、降级
+    sentinel:
+      scg:
+        fallback:
+          mode: response
+          response-status: 200
+          response-body: '{"code": 200,"message": "请求失败，稍后重试！"}'
+      transport:
+        ## 指定控制台的地址，默认端口8080
+        dashboard: localhost:8858
+      eager: true   #当服务启动时是否与sentinel建立链接
+      web-context-unify: false  #关闭 URL PATH 聚合
+    nacos:
+      config:
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        prefix: ${spring.application.name}
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      httpclient:
+        pool:
+          maxIdleTime: 10000 #（根据需要调整）
+      globalcors:
+        cors-configurations:
+          '[/**]': # 匹配所有请求
+            allowedOrigins: "*" #跨域处理 允许所有的域
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      routes:
+        #唯一标识符
+        - id: web_login_route
+          #        #用户请求需要路由到该服务【指定该服务的路由】
+          uri: lb://service-web-oauth
+
+          #路由规则配置
+          predicates:
+            - Path=/login/**
+
+          filters:
+            #局部限流过滤器
+            - name: RequestRateLimiter #请求数限流 名字不能随便写 ，使用默认的facatory
+              args:
+                key-resolver: "#{@ipKeyResolver}"
+                #每秒只允许请求个数
+                redis-rate-limiter.replenishRate: 1
+                #允许并发有请求个数
+                redis-rate-limiter.burstCapacity: 1
+
+        #唯一标识符
+        - id: web_index_route
+          #        #用户请求需要路由到该服务【指定该服务的路由】
+          uri: lb://service-web-index
+          #路由规则配置
+          predicates:
+            - Path=/index/**,/webSeckill/**,/member/**
+        #唯一标识符
+        - id: seckill_route
+        #        #用户请求需要路由到该服务【指定该服务的路由】
+          uri: lb://seckill
+        #路由规则配置
+          predicates:
+            - Path=/seckillGoods/**,/seckillOrder/**,/order/**

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="erabbit.service.seckill.mapper.SeckillOrderMapper">
+
+
+    <select id="getSku" resultType="com.erabbit.seckill.pojo.TSku">
+        select sg.sku_id id,sg.price curPrice,sg.cost_price realPay,sg.name,sg.sup_id spuId,sg.small_pic image,sku.spec attrsText
+        from tb_seckill_goods sg join tb_sku sku on sg.sku_id = sku.id
+        where sg.id = #{seckillId}
+
+    </select>
+</mapper>
